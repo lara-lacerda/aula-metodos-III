@@ -1,7 +1,6 @@
 ---
 title: "Trabalho Final - Métodos III"
-author: "Lara Nunes"
-date: "2026-07-15"
+author: "Lara Nunes de Lacerda - n°USP 14586921"
 output: pdf_document
 ---
 
@@ -9,13 +8,92 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+       O artigo *Nomeação a cargos públicos no Brasil: um estudo comparado das pastas de Agricultura e Cultura do Executivo Federal (2011-2021)*, publicado em 2025 por Nayara Albrecht e Pedro Ribeiro, é um estudo comparativo entre as nomeações para cargos comissionados, de níveis 4 a 6, nas pastas da Cultura (MinC/SECULT) e da Agricultura (MAPA). A pergunta que fundamenta a pesquisa é: Em que medida a trajetória política e profissional importa para a nomeação de cargos nas secretárias dos ministérios?. Dessa maneira, a base de dados formulada pelos autores tem como unidade de análise a nomeação, portanto cada linha corresponde à uma nomeação feita por um presidente, nos anos de 2011 a 2021 - o que pode ocasionar na repetição de indivíduos, caso tenha sido nomeado para mais de um cargo nesse período.
+
+## 1. Leitura dos Dados
+
+       A base de dados abaixo foi extraída do respositório da autora, Nayara Albrecht[^1].
+
+[^1]: Repositório burocraciaBR (<https://github.com/nayalbrecht/burocraciaBR>). Acesso em: 14 jul. 2026.
+
 ```{r message=FALSE, warning=FALSE}
 library(readxl)
 library(dplyr)
 library(ggplot2)
 
-base_cargos2 <- read_excel("dados/BASE_cargos2.xlsx")
+base_cargos2 <- read_excel("dados/BASE_cargos2.xlsx", sheet = "BASE_cargos")
+codebook <- read_excel("dados/BASE_cargos2.xlsx", sheet = "Codebook")
 ```
 
-Base de dados do github https://github.com/nayalbrecht/burocraciaBR/tree/main
-acessado em 14/07/2026
+```{r, results = 'hide'}
+base_cargos2 %>% count(orgao_sup)
+```
+
+```{r, results = 'hide'}
+base_cargos2 <- base_cargos2 %>% 
+  mutate(across(where(is.character), ~na_if(trimws(.x), "NA")))
+
+base_cargos2 %>%
+  select(orgao_sup, instr, exp_adm, exp_car, exp_mer, partido, car_pub) %>%
+  is.na() %>% 
+  colSums()
+```
+
+```{r, results = 'hide'}
+base_cargos2 %>% count(exp_adm)
+base_cargos2 %>% count(exp_car)
+base_cargos2 %>% count(nivel)
+base_cargos2 %>% count(instr)
+base_cargos2 %>% count(indicacao)
+
+
+base_cargos <- base_cargos2 %>%
+  mutate(exp_adm = case_when(exp_adm == "3" ~ NA_character_,
+                             exp_adm == "`1" ~ "1", TRUE ~ exp_adm),
+         exp_adm = as.numeric(exp_adm),
+         exp_car = ifelse(exp_car == 5, 3, exp_car),
+         exp_car = as.numeric(exp_car))
+```
+
+1.  A base consta com 1038 linhas e 26 colunas.
+2.  As variáveis são: orgao_sup, setor, chave, id, cargo, funcao, nivel, instr, area, inst_ensino, inst_origem, car_pub, partido, cargo_ele, lid_part, exp_adm, exp_car, exp_mer, exp_soc, UF\*, partido_pr, partido_ministro, indicacao, entrada, saida e perm.
+3.  Para o MAPA foram encontradas 525 observações, para o MCTI 148 e para o MINC 365.
+4.  Quantidade de valores ausentes nas colunas: exp_adm = 11; car_pub = 17; exp_car = 76; instr = 95; exp_mer = 260; partido = 909.
+5.  Checagem feita no último chunk acima.
+
+       A checagem de valores ausentes apresentou problema devido à sinalização manualmente escrita das NAs, ao invés da atribuição automática do programa, logo, foi necessário modificar a base de dados, através da função `mutate`, para que o R identificasse esses valores como NAs.
+
+       Na checagem específica das variáveis indicadas, foram encontrados dois problemas, em `exp_adm` quatro informações estavam preenchidas como \``1` e `3`, e em `exp_car` 253 informações apresentavam o número 5 (apesar da classificação ir de 1 a 3). Para a primeira variável, removi a crase do 1, transformei o 3 em NA, e tornei a variável númerica, pois estava classificada como nominal. Em seguida, acredito que a grande repetição do número 5 em `exp_car` se dá por uma falha na padronização da base de dados, pois no codebook a classificação é de 1 a 3, sendo o 3 = DAS 5-6; portanto, poderia ser uma confusão entre a numeração original e a dos autores. Sendo assim, alterei todos os valores 5 por 3 e também transformei a variável em numérica, para facilitar futuras análises.
+
+## 2. Tabela Descritiva
+
+       Para formular a tabela abaixo, foi utilizada a variável `exp_adm`, pois indica experiência em órgãos da administração pública (Codebook) de maneira binária, 1 = SIM; 0 = NÃO.
+
+```{r echo=TRUE}
+tabela_descritiva <- base_cargos %>%
+  filter(orgao_sup %in% c("mapa", "minc")) %>%
+  group_by(orgao_sup) %>%
+  summarise(obs_validas = sum(!is.na(exp_adm)),
+            com_experiencia = sum(exp_adm == 1, na.rm = TRUE),
+            proporcao = com_experiencia / obs_validas,
+            margem_erro = 1.96 * sqrt((proporcao * (1 - proporcao)) / obs_validas),
+            ic_inferior = proporcao - margem_erro,
+            ic_superior = proporcao + margem_erro)
+
+knitr::kable(tabela_descritiva,
+             col.names = c("Órgão Superior", "Indicações", "Com Experiência",
+                           "Proporção", "Margem de Erro (95%)",
+                           "IC Inferior", "IC Superior"),
+             digits = 4, align = "c",
+             caption = "Proporção de indicações com experiência administrativa")
+```
+
+*Fonte: Elaboração própria com base no banco de dados do artigo.*
+
+       Como observado na Tabela 1, existe uma proporção similar de indicações de pessoas com experiência em administração pública entre as pastas de agricultura (92%) e cultura (88%). A margem de erro encontrada, de 0.0232 para a pasta de agricultura e 0.0337 para a de cultura, nada mais é do que quanto espera-se que o resultado pode variar, e a partir dela surge o intervalo de confiança, que soma e subtrai este valor, gerando um intervalo de possíveis resultados esperados. É importante ressaltar que a margem de erro pode variar conforme o intervalo de confiança desejado, e nesse caso foi utilizado um intervalo que corresponde a 95% de certeza, portanto 5% de erro. Sendo assim, a análise estatística a partir dos dados do MAPA e MinC estima, com 95% de certeza, que a proporção de indicações com experiência se situa entre 89,66% e 94,31% (intervalo de confiança) para o MAPA, e entre 84,77% e 91,50% para o MinC. Ambos valores são altos, e se considerada essa variável sozinha, relatam maioria expressiva de funcionários públicos experientes nestes ministérios.
+
+## 3. Primeiro Teste de Hipótese Bivariado
+
+## 4. Segundo Teste de Hipótese Bivariado
+
+## 5. Análise dos Testes
