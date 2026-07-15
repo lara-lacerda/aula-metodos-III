@@ -1,0 +1,21 @@
+---
+title: "Trabalho Final - Métodos III"
+author: "Lara Nunes"
+date: "2026-07-15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+base_cargos2 <- read_excel("dados/BASE_cargos2.xlsx")
+```
+
+Base de dados do github https://github.com/nayalbrecht/burocraciaBR/tree/main
+acessado em 14/07/2026
