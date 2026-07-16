@@ -146,5 +146,20 @@ summary(teste2)
 
 1. Nível de Significância 10%
 
+       Considerando o p-valor de 0.0573, encontrado no primeiro teste, um nível de significância de 10% implica na rejeição da hipótese nula, pois o p-valor é menor que 0.10. Então, a conclusão seria outra: existe diferença na proporção de nomeações experientes entre as pastas de agricultura e cultura.
+
 2. Nível de Significância 1%
 
+       Com um nível de significância tão baixo, a barra para rejeitar a hipótese nula fica muito alta, pois exige um p-valor seja menor que 0.01. Portanto, como 0.0573 > 0.01, a hipótese não é rejeitada, e o resultado seria que os dois ministérios possuem proporções iguais, pois não há evidências suficientes para afirmar o contrário.
+
+3. Conclusão
+
+       O nível de significância é arbitrário, uma vez que é definido pelo próprio pesquisador e a confirmação ou não da hipótese depende dele. Por isso, existe uma tendência acadêmica à padronização do valor de significância para 5%, que procura garantir relevância estatística nos resultados. Assim, quanto menor o nível de significância, maior a rigidez para a comprovação da hipótese a partir do p-valor. 
+
+## 6. Maior Amostra: Caso da Experiência Administrativa
+
+```{r echo=TRUE}
+summary(teste1)$coefficients[, "Std. Error"] / sqrt(2)
+```
+
+        Duplicando a quantidade de informações nas pastas do MAPA e do MinC, o erro padrão de 0.02022 (calculado no primeiro teste) cairia para 0.01429. Pensando que o modelo estatístico busca previsibilidade, é lógico pensar que uma amostra maior delimitará um modelo mais preciso, pois carrega mais informações. Assim, o erro padrão, que é a incerteza da estimativa, tende a diminuir, como observado neste caso.
