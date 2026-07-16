@@ -94,6 +94,22 @@ knitr::kable(tabela_descritiva,
 
 ## 3. Primeiro Teste de Hipótese Bivariado
 
+       Nessa etapa será testada a hipótese de que a proporção de nomeações com experiência administrativa é igual nas pastas do MAPA e MinC, a partir de um teste bilateral.
+
+$H_1: p_{\text{MAPA}} \neq p_{\text{MinC}}$
+
+$H_0: p_{\text{MAPA}} = p_{\text{MinC}}$
+
+```{r}
+dados_teste1 <- base_cargos %>%
+  filter(orgao_sup %in% c("mapa", "minc"),
+         !is.na(exp_adm))
+
+teste1 <- lm(exp_adm ~ orgao_sup, data = dados_teste1)
+summary(teste1)
+```
+       O primeiro código rodado, `filter`, filtra as informações vazias na coluna `exp_adm` para garantir um resultado mais confiável. Em seguida, foi feito um modelo de regressão linear para testar a hipótese nula, de que não existe diferença na proporção de nomeações experientes das pastas. Levando em conta o nível de significância de 5%, a hipótese nula não é rejeitada, já que o p-valor apresentado de 0.0573 é maior que o limite estabelecido (p > 0.05). Isso indica que se a taxa real de nomeações experientes fosse totalmente idêntica nos dois ministérios, haveria uma chance de 5,75% de encontrarmos a diferença observada de 3,8 pontos.
+
 ## 4. Segundo Teste de Hipótese Bivariado
 
 ## 5. Análise dos Testes
