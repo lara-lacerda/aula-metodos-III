@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
 library(dplyr)
 library(ggplot2)
+library(knitr)
 
 base_cargos2 <- read_excel("dados/BASE_cargos2.xlsx", sheet = "BASE_cargos")
 codebook <- read_excel("dados/BASE_cargos2.xlsx", sheet = "Codebook")
@@ -94,6 +95,56 @@ knitr::kable(tabela_descritiva,
 
 ## 3. Primeiro Teste de Hipótese Bivariado
 
+       Nessa etapa será testada a hipótese de que a proporção de nomeações com experiência administrativa é igual nas pastas do MAPA e MinC, a partir de um teste bilateral.
+
+$H_1: p_{\text{MAPA}} \neq p_{\text{MinC}}$
+
+$H_0: p_{\text{MAPA}} = p_{\text{MinC}}$
+
+```{r}
+dados_teste1 <- base_cargos %>%
+  filter(orgao_sup %in% c("mapa", "minc"),
+         !is.na(exp_adm))
+
+teste1 <- lm(exp_adm ~ orgao_sup, data = dados_teste1)
+summary(teste1)
+```
+       O primeiro código rodado, `filter`, filtra as informações vazias na coluna `exp_adm` para garantir um resultado mais confiável. Em seguida, foi feito um modelo de regressão linear para testar a hipótese nula, de que não existe diferença na proporção de nomeações experientes das pastas. Levando em conta o nível de significância de 5%, a hipótese nula não é rejeitada, já que o p-valor apresentado de 0.0573 é maior que o limite estabelecido (p > 0.05). Isso indica que se a taxa real de nomeações experientes fosse totalmente idêntica nos dois ministérios, haveria uma chance de 5,75% de encontrarmos a diferença observada de 3,8 pontos.
+
 ## 4. Segundo Teste de Hipótese Bivariado
 
-## 5. Análise dos Testes
+```{r, results = 'hide'}
+dados_teste2 <- base_cargos %>%
+  filter(orgao_sup %in% c("mapa", "minc"), !is.na(nivel)) %>%
+  mutate(alto_nivel = ifelse(nivel %in% c(5, 6), 1, 0))
+
+tabela_teste2 <- dados_teste2 %>%
+  group_by(orgao_sup) %>%
+  summarise(n_valido = n(),
+            casos_alto_nivel = sum(alto_nivel == 1),
+            proporcao = mean(alto_nivel),
+            margem_erro = 1.96 * sqrt((proporcao * (1 - proporcao)) / n_valido),
+            ic_inf = proporcao - margem_erro,
+            ic_sup = proporcao + margem_erro)
+
+knitr::kable(tabela_teste2,
+             col.names = c("Órgão Superior", "Indicações", "Cargos Alto Nível",
+                           "Proporção", "Margem de Erro (95%)",
+                           "IC Inferior", "IC Superior"),
+             digits = 4, align = "c",
+             caption = "Proporção de indicações para cargos de alto nível")
+```
+
+```{r}
+teste2 <- lm(alto_nivel ~ orgao_sup, data = dados_teste2)
+summary(teste2)
+```
+
+       Este segundo teste de hipótese avalia a hipótese nula de que a proporção de cargos para o alto nível é idêntica nas duas pastas. Com um p-valor de 0.0389, rejeita-se essa hipótese a 5% de significância, o que significa que a diferença de 0.06847 pontos apresentada é grande o suficiente para comprovar que a proporção de cargos não é a mesma. Contudo, do ponto de vista substantivo a diferença parece, sim, pequena, pois a proporção é de 35,62% no MAPA e 42,47% no MinC, são apenas 6,85% de vagas a mais, mas é um valor grande o suficiente para apresentar relevância estatística.
+
+## 5. Análise do primeiro teste de hipóteses: Experiência Administrativa
+
+1. Nível de Significância 10%
+
+2. Nível de Significância 1%
+
