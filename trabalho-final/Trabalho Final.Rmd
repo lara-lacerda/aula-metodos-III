@@ -162,4 +162,4 @@ summary(teste2)
 summary(teste1)$coefficients[, "Std. Error"] / sqrt(2)
 ```
 
-        Duplicando a quantidade de informações nas pastas do MAPA e do MinC, o erro padrão de 0.02022 (calculado no primeiro teste) cairia para 0.01429. Pensando que o modelo estatístico busca previsibilidade, é lógico pensar que uma amostra maior delimitará um modelo mais preciso, pois carrega mais informações. Assim, o erro padrão, que é a incerteza da estimativa, tende a diminuir, como observado neste caso.
+        Duplicando a quantidade de informações nas pastas do MAPA e do MinC, o erro padrão de 0.02022 (calculado no primeiro teste) cairia para 0.01429. Pensando que o modelo estatístico busca previsibilidade, é lógico pensar que uma amostra maior delimitará um modelo mais preciso, pois carrega mais informações (Lei dos Grandes Números). Assim, o erro padrão, que é a incerteza da estimativa, tende a diminuir, como observado neste caso.
