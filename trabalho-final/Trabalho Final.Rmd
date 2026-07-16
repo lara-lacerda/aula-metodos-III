@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Leitura dos Dados
 
-       A base de dados abaixo foi extraída do respositório da autora, Nayara Albrecht[^1].
+       A base de dados abaixo foi extraída do repositório da autora, Nayara Albrecht[^1].
 
 [^1]: Repositório burocraciaBR (<https://github.com/nayalbrecht/burocraciaBR>). Acesso em: 14 jul. 2026.
 
@@ -64,7 +64,7 @@ base_cargos <- base_cargos2 %>%
 
        A checagem de valores ausentes apresentou problema devido à sinalização manualmente escrita das NAs, ao invés da atribuição automática do programa, logo, foi necessário modificar a base de dados, através da função `mutate`, para que o R identificasse esses valores como NAs.
 
-       Na checagem específica das variáveis indicadas, foram encontrados dois problemas, em `exp_adm` quatro informações estavam preenchidas como \``1` e `3`, e em `exp_car` 253 informações apresentavam o número 5 (apesar da classificação ir de 1 a 3). Para a primeira variável, removi a crase do 1, transformei o 3 em NA, e tornei a variável númerica, pois estava classificada como nominal. Em seguida, acredito que a grande repetição do número 5 em `exp_car` se dá por uma falha na padronização da base de dados, pois no codebook a classificação é de 1 a 3, sendo o 3 = DAS 5-6; portanto, poderia ser uma confusão entre a numeração original e a dos autores. Sendo assim, alterei todos os valores 5 por 3 e também transformei a variável em numérica, para facilitar futuras análises.
+       Na checagem específica das variáveis indicadas, foram encontrados dois problemas, em `exp_adm` quatro informações estavam preenchidas como ``1` e `3`, e em `exp_car` 253 informações apresentavam o número 5 (apesar da classificação ir de 1 a 3). Para a primeira variável, removi a crase do 1, transformei o 3 em NA, e tornei a variável númerica, pois estava classificada como nominal. Em seguida, acredito que a grande repetição do número 5 em `exp_car` se dá por uma falha na padronização da base de dados, pois no codebook a classificação é de 1 a 3, sendo o 3 = DAS 5-6; portanto, poderia ser uma confusão entre a numeração original e a dos autores. Sendo assim, alterei todos os valores 5 por 3 e também transformei a variável em numérica, para facilitar futuras análises.
 
 ## 2. Tabela Descritiva
 
@@ -97,9 +97,9 @@ knitr::kable(tabela_descritiva,
 
        Nessa etapa será testada a hipótese de que a proporção de nomeações com experiência administrativa é igual nas pastas do MAPA e MinC, a partir de um teste bilateral.
 
-$H_1: p_{\text{MAPA}} \neq p_{\text{MinC}}$
-
 $H_0: p_{\text{MAPA}} = p_{\text{MinC}}$
+
+$H_1: p_{\text{MAPA}} \neq p_{\text{MinC}}$
 
 ```{r}
 dados_teste1 <- base_cargos %>%
@@ -109,7 +109,7 @@ dados_teste1 <- base_cargos %>%
 teste1 <- lm(exp_adm ~ orgao_sup, data = dados_teste1)
 summary(teste1)
 ```
-       O primeiro código rodado, `filter`, filtra as informações vazias na coluna `exp_adm` para garantir um resultado mais confiável. Em seguida, foi feito um modelo de regressão linear para testar a hipótese nula, de que não existe diferença na proporção de nomeações experientes das pastas. Levando em conta o nível de significância de 5%, a hipótese nula não é rejeitada, já que o p-valor apresentado de 0.0573 é maior que o limite estabelecido (p > 0.05). Isso indica que se a taxa real de nomeações experientes fosse totalmente idêntica nos dois ministérios, haveria uma chance de 5,75% de encontrarmos a diferença observada de 3,8 pontos.
+       O primeiro código rodado, `filter`, filtra as informações vazias na coluna `exp_adm` para garantir um resultado mais confiável. Em seguida, foi feito um modelo de regressão linear para testar a hipótese nula, de que não existe diferença na proporção de nomeações experientes das pastas. Levando em conta o nível de significância de 5%, a hipótese nula não é rejeitada, já que o p-valor apresentado de 0.0573 é maior que o limite estabelecido (p > 0.05). Isso indica que se a taxa real de nomeações experientes fosse totalmente idêntica nos dois ministérios, haveria uma chance de 5,75% de encontrarmos a diferença observada de 3,8 pontos, ou maior.
 
 ## 4. Segundo Teste de Hipótese Bivariado
 
@@ -154,7 +154,7 @@ summary(teste2)
 
 3. Conclusão
 
-       O nível de significância é arbitrário, uma vez que é definido pelo próprio pesquisador e a confirmação ou não da hipótese depende dele. Por isso, existe uma tendência acadêmica à padronização do valor de significância para 5%, que procura garantir relevância estatística nos resultados. Assim, quanto menor o nível de significância, maior a rigidez para a comprovação da hipótese a partir do p-valor. 
+       O nível de significância é arbitrário, uma vez que é definido pelo próprio pesquisador, e a confirmação ou não da hipótese depende dele. Por isso, existe uma tendência acadêmica à padronização do valor de significância para 5%, que procura garantir relevância estatística nos resultados. Assim, quanto menor o nível de significância, maior a rigidez para a comprovação da hipótese a partir do p-valor. 
 
 ## 6. Maior Amostra: Caso da Experiência Administrativa
 
